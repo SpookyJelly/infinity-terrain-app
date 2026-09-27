@@ -1,0 +1,36 @@
+:root {
+  color-scheme: light;
+  --bg: #ebe4d4;
+  --panel: #f7f2e6;
+  --ink: #2a2418;
+  --muted: #6a5f4c;
+  --line: #c9bea6;
+  --accent: #3d5a40;
+  --accent-soft: #d6e0d4;
+  font-family: 'Segoe UI', 'Helvetica Neue', sans-serif;
+  line-height: 1.4;
+  font-weight: 400;
+  color: var(--ink);
+  background: var(--bg);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  height: 100%;
+}
+
+button,
+input,
+select {
+  font: inherit;
+  color: inherit;
+}
