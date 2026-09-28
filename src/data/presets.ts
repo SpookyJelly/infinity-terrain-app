@@ -1,6 +1,6 @@
 import type { TerrainPiece } from '../types/terrain'
 
-/** 1단계용 하드코딩 프리셋 (이후 단계에서 편집 가능). */
+/** 기본 프리셋. 앱에서는 복사본을 쓰며 수치를 편집할 수 있다. */
 export const PRESET_PIECES: TerrainPiece[] = [
   {
     id: 'small-crate',

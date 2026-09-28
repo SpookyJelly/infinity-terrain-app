@@ -1,17 +1,23 @@
-import { MapCanvas } from './components/MapCanvas'
-import { Sidebar } from './components/Sidebar'
-import { Toolbar } from './components/Toolbar'
-import { useMapState } from './hooks/useMapState'
-import './App.css'
+import { MapCanvas } from "./components/MapCanvas";
+// import { PieceInspector } from './components/PieceInspector'
+import { Sidebar } from "./components/Sidebar";
+import { Toolbar } from "./components/Toolbar";
+import { useMapState } from "./hooks/useMapState";
+import "./App.css";
 
 export default function App() {
-  const state = useMapState()
+  const state = useMapState();
 
   return (
     <div className="app">
       <Sidebar
         library={state.library}
-        onAdd={state.addPieceFromLibrary}
+        onPlace={state.addPieceFromLibrary}
+        onUpdatePiece={state.updateLibraryPiece}
+        onAddPiece={state.addLibraryPiece}
+        onRemovePiece={state.removeLibraryPiece}
+        onExport={state.exportLibrary}
+        onImportFile={state.importLibrary}
       />
       <div className="main">
         <Toolbar
@@ -41,6 +47,12 @@ export default function App() {
             </button>
           </div>
         )}
+        {/* {state.selectedDef && (
+          <PieceInspector
+            piece={state.selectedDef}
+            onSaveAsDerived={state.saveSelectedAsDerived}
+          />
+        )} */}
         <MapCanvas
           map={state.map}
           library={state.library}
@@ -55,5 +67,5 @@ export default function App() {
         />
       </div>
     </div>
-  )
+  );
 }

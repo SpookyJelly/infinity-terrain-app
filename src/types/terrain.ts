@@ -4,6 +4,21 @@ export type TerrainCategory =
   | 'impassable'
   | 'special'
 
+export type LadderSide = 'N' | 'S' | 'E' | 'W'
+
+export interface SecondFloor {
+  width: number
+  depth: number
+  offsetX: number
+  offsetY: number
+}
+
+export interface LadderPosition {
+  x: number
+  y: number
+  side: LadderSide
+}
+
 export interface TerrainPiece {
   id: string
   name: string
@@ -11,7 +26,9 @@ export interface TerrainPiece {
   category: TerrainCategory
   maxCount: number | null
   hasSecondFloor: boolean
+  secondFloor?: SecondFloor
   hasLadder: boolean
+  ladderPosition?: LadderPosition
   color: string
   derivedFrom?: string
 }
