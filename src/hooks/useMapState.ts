@@ -175,17 +175,22 @@ export function useMapState() {
       setStatusMsg('고정되지 않은 지형이 없어 재배치할 대상이 없습니다.')
       return
     }
-    const { pieces: next, failed } = randomizeLayout(library, map, pieces)
+    const { pieces: next, failed, balanced, centerFilled, skippedCenterRule } =
+      randomizeLayout(library, map, pieces, deployment)
     setPieces(next)
     setSelectedIds([])
+
+    const notes: string[] = []
     if (failed.length > 0) {
-      setStatusMsg(
-        `랜덤 재배치 완료. ${failed.length}개는 자리 부족으로 위치 유지.`,
-      )
-    } else {
-      setStatusMsg(`${unlockedCount}개 지형을 랜덤 재배치했습니다.`)
+      notes.push(`${failed.length}개는 자리 부족으로 위치 유지`)
     }
-  }, [library, map, pieces])
+    if (balanced) notes.push('좌우 커버리지 균형')
+    else notes.push('좌우 커버리지가 조금 기울어짐')
+    if (!skippedCenterRule) {
+      notes.push(centerFilled ? '중앙에 중형 이상 배치' : '중앙이 비어 있음')
+    }
+    setStatusMsg(`${unlockedCount}개 재배치. ${notes.join(' · ')}`)
+  }, [deployment, library, map, pieces])
 
   const clearAll = useCallback(() => {
     setPieces([])

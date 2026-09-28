@@ -134,14 +134,59 @@ export function canPlace(
 
 const ORTHO_ANGLES = [0, 90, 180, 270] as const
 
+export function pieceFootprintArea(def: TerrainPiece): number {
+  return def.footprint.width * def.footprint.depth
+}
+
+export function longestSide(def: TerrainPiece): number {
+  return Math.max(def.footprint.width, def.footprint.depth)
+}
+
+/** Medium+ used for the “center must not be empty” rule. */
+export function isMediumOrLarger(def: TerrainPiece): boolean {
+  return longestSide(def) >= 6 || pieceFootprintArea(def) >= 24
+}
+
+/** Large pieces get lower weight near deployment zones. */
+export function isLargePiece(def: TerrainPiece): boolean {
+  return longestSide(def) >= 8 || pieceFootprintArea(def) >= 48
+}
+
+export function intersectionArea(a: Rect, b: Rect): number {
+  const x = Math.max(0, Math.min(a.x + a.width, b.x + b.width) - Math.max(a.x, b.x))
+  const y = Math.max(
+    0,
+    Math.min(a.y + a.height, b.y + b.height) - Math.max(a.y, b.y),
+  )
+  return x * y
+}
+
+export interface PlacementOptions {
+  maxAttempts?: number
+  /** Extra clamp on piece center (inches) */
+  centerBounds?: {
+    minX: number
+    maxX: number
+    minY: number
+    maxY: number
+  }
+  reject?: (candidate: PlacedPiece) => boolean
+}
+
 export function tryRandomPlacement(
   pieceId: string,
   instanceId: string,
   others: PlacedPiece[],
   library: TerrainPiece[],
   map: MapConfig,
-  maxAttempts = 100,
+  maxAttemptsOrOptions: number | PlacementOptions = 100,
 ): PlacedPiece | null {
+  const options: PlacementOptions =
+    typeof maxAttemptsOrOptions === 'number'
+      ? { maxAttempts: maxAttemptsOrOptions }
+      : maxAttemptsOrOptions
+  const maxAttempts = options.maxAttempts ?? 100
+
   const def = getPieceDef(library, pieceId)
   if (!def) return null
 
@@ -153,10 +198,16 @@ export function tryRandomPlacement(
       def.footprint.depth,
       rotation,
     )
-    const minX = buf + width / 2
-    const maxX = map.widthIn - buf - width / 2
-    const minY = buf + depth / 2
-    const maxY = map.heightIn - buf - depth / 2
+    let minX = buf + width / 2
+    let maxX = map.widthIn - buf - width / 2
+    let minY = buf + depth / 2
+    let maxY = map.heightIn - buf - depth / 2
+    if (options.centerBounds) {
+      minX = Math.max(minX, options.centerBounds.minX)
+      maxX = Math.min(maxX, options.centerBounds.maxX)
+      minY = Math.max(minY, options.centerBounds.minY)
+      maxY = Math.min(maxY, options.centerBounds.maxY)
+    }
     if (minX > maxX || minY > maxY) return null
 
     const candidate: PlacedPiece = {
@@ -166,6 +217,7 @@ export function tryRandomPlacement(
       y: minY + Math.random() * (maxY - minY),
       rotation,
     }
+    if (options.reject?.(candidate)) continue
     if (canPlace(candidate, others, library, map)) return candidate
   }
   return null
