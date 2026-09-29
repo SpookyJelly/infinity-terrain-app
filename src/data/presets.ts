@@ -42,4 +42,16 @@ export const PRESET_PIECES: TerrainPiece[] = [
     hasLadder: false,
     color: '#3d7a4a',
   },
+  {
+    id: 'two-storey-ladder',
+    name: '2층 건물 + 사다리',
+    footprint: { width: 8, depth: 8 },
+    category: 'total_cover',
+    maxCount: 2,
+    hasSecondFloor: true,
+    secondFloor: { width: 5, depth: 5, offsetX: 0, offsetY: 0 },
+    hasLadder: true,
+    ladderPosition: { x: 0, y: 0, side: 'S' },
+    color: '#7b6650',
+  },
 ]

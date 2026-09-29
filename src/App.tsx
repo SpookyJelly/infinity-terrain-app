@@ -31,8 +31,10 @@ export default function App() {
           onBorderBuffer={state.setBorderBuffer}
           onToggleGrid={state.toggleGrid}
           onToggleDeployment={state.toggleDeployment}
+          onDeploymentDepth={state.setDeploymentDepth}
           onDeploymentAxis={state.setDeploymentAxis}
           onRandomize={state.randomizeAll}
+          onRandomRotate={state.randomRotateUnlocked}
           onClearAll={state.clearAll}
           onRotate90={state.rotateSelected90}
           onFreeRotate={state.freeRotateSelected}
@@ -63,7 +65,6 @@ export default function App() {
           onSelect={state.selectPiece}
           onMove={state.movePiece}
           onRotatePiece={state.setPieceRotation}
-          onDeploymentDepth={state.setDeploymentDepth}
         />
       </div>
     </div>

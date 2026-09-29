@@ -149,6 +149,19 @@ export function useMapState() {
     );
   }, [selectedIds]);
 
+  const randomRotateUnlocked = useCallback(() => {
+    const count = pieces.filter((piece) => !piece.locked).length
+    if (count === 0) {
+      setStatusMsg("회전할 수 있는 고정되지 않은 지형이 없습니다.")
+      return
+    }
+    setPieces((prev) =>
+      prev.map((piece) =>
+        piece.locked ? piece : { ...piece, rotation: Math.random() * 360 },
+      ),
+    )
+    setStatusMsg("고정되지 않은 지형을 모두 무작위로 회전했습니다.")
+  }, [pieces])
   const freeRotateSelected = useCallback(() => {
     if (selectedIds.length === 0) return;
     const idSet = new Set(selectedIds);
@@ -388,6 +401,7 @@ export function useMapState() {
     setPieceRotation,
     rotateSelected90,
     freeRotateSelected,
+    randomRotateUnlocked,
     deleteSelected,
     toggleLockSelected,
     randomizeAll,

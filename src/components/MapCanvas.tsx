@@ -22,18 +22,15 @@ interface MapCanvasProps {
   onSelect: (instanceId: string | null, additive?: boolean) => void
   onMove: (instanceId: string, x: number, y: number) => void
   onRotatePiece: (instanceId: string, rotation: number) => void
-  onDeploymentDepth: (depthIn: number) => void
 }
 
 type DragKind =
   | { type: 'piece'; id: string; offsetX: number; offsetY: number }
-  | { type: 'dz-edge'; edge: 'near' | 'far' }
   | { type: 'rotate'; id: string }
 
 /** Minimum touch-friendly hit radius in CSS pixels (~44px finger target). */
 const HANDLE_HIT_CSS_PX = 28
 const HANDLE_VISUAL_CSS_PX = 14
-const DZ_EDGE_HIT_CSS_PX = 20
 
 function cssPxPerMapInch(canvas: HTMLCanvasElement, mapWidthIn: number): number {
   const rect = canvas.getBoundingClientRect()
@@ -55,25 +52,6 @@ function hitTest(
     const def = getPieceDef(library, p.pieceId)
     if (!def) continue
     if (pointHitsPiece(xIn, yIn, p, def)) return p.instanceId
-  }
-  return null
-}
-
-function dzEdgeHit(
-  deployment: DeploymentZone,
-  map: MapConfig,
-  xIn: number,
-  yIn: number,
-  slopIn: number,
-): 'near' | 'far' | null {
-  if (!deployment.visible) return null
-  const d = deployment.depthIn
-  if (deployment.axis === 'NS') {
-    if (Math.abs(yIn - d) <= slopIn) return 'near'
-    if (Math.abs(yIn - (map.heightIn - d)) <= slopIn) return 'far'
-  } else {
-    if (Math.abs(xIn - d) <= slopIn) return 'near'
-    if (Math.abs(xIn - (map.widthIn - d)) <= slopIn) return 'far'
   }
   return null
 }
@@ -101,7 +79,6 @@ export function MapCanvas({
   onSelect,
   onMove,
   onRotatePiece,
-  onDeploymentDepth,
 }: MapCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [drag, setDrag] = useState<DragKind | null>(null)
@@ -184,6 +161,17 @@ export function MapCanvas({
         ctx.lineTo(widthPx, y)
         ctx.stroke()
       }
+      ctx.save()
+      ctx.font = '10px system-ui, sans-serif'
+      ctx.fillStyle = 'rgba(45, 40, 32, 0.72)'
+      ctx.textBaseline = 'top'
+      for (let x = 0; x <= widthPx; x += step) {
+        ctx.fillText("X " + Math.round(pxToInches(x)) + "″", Math.min(x + 4, widthPx - 38), 4)
+      }
+      for (let y = step; y <= heightPx; y += step) {
+        ctx.fillText("Y " + Math.round(pxToInches(y)) + "″", 4, Math.min(y + 3, heightPx - 14))
+      }
+      ctx.restore()
     }
 
     for (const p of pieces) {
@@ -208,6 +196,48 @@ export function MapCanvas({
         ctx.lineWidth = 1
       }
       ctx.strokeRect(-w / 2, -h / 2, w, h)
+
+      if (def.hasSecondFloor && def.secondFloor) {
+        const upperW = inchesToPx(def.secondFloor.width)
+        const upperH = inchesToPx(def.secondFloor.depth)
+        const upperX = inchesToPx(def.secondFloor.offsetX)
+        const upperY = inchesToPx(def.secondFloor.offsetY)
+        ctx.fillStyle = 'rgba(255, 250, 225, 0.48)'
+        ctx.fillRect(upperX - upperW / 2, upperY - upperH / 2, upperW, upperH)
+        ctx.strokeStyle = 'rgba(255, 255, 245, 0.95)'
+        ctx.lineWidth = 2
+        ctx.strokeRect(upperX - upperW / 2, upperY - upperH / 2, upperW, upperH)
+        ctx.beginPath()
+        ctx.moveTo(upperX - upperW / 2 + 3, upperY - upperH / 2 + 3)
+        ctx.lineTo(upperX + upperW / 2 - 3, upperY + upperH / 2 - 3)
+        ctx.moveTo(upperX + upperW / 2 - 3, upperY - upperH / 2 + 3)
+        ctx.lineTo(upperX - upperW / 2 + 3, upperY + upperH / 2 - 3)
+        ctx.stroke()
+      }
+
+      if (def.hasLadder && def.ladderPosition) {
+        const ladder = def.ladderPosition
+        const marker = inchesToPx(0.8)
+        const lx = inchesToPx(ladder.x)
+        const ly = inchesToPx(ladder.y)
+        ctx.strokeStyle = '#f5c542'
+        ctx.lineWidth = 5
+        ctx.lineCap = 'round'
+        ctx.beginPath()
+        if (ladder.side === 'N' || ladder.side === 'S') {
+          const edgeY = ladder.side === 'N' ? -h / 2 : h / 2
+          const edgeX = Math.max(-w / 2 + marker / 2, Math.min(w / 2 - marker / 2, lx))
+          ctx.moveTo(edgeX - marker / 2, edgeY)
+          ctx.lineTo(edgeX + marker / 2, edgeY)
+        } else {
+          const edgeX = ladder.side === 'W' ? -w / 2 : w / 2
+          const edgeY = Math.max(-h / 2 + marker / 2, Math.min(h / 2 - marker / 2, ly))
+          ctx.moveTo(edgeX, edgeY - marker / 2)
+          ctx.lineTo(edgeX, edgeY + marker / 2)
+        }
+        ctx.stroke()
+        ctx.lineCap = 'butt'
+      }
 
       if (p.locked) {
         ctx.fillStyle = 'rgba(255, 220, 80, 0.95)'
@@ -307,7 +337,6 @@ export function MapCanvas({
     const { xIn, yIn } = clientToInches(e.clientX, e.clientY)
     const additive = e.shiftKey || e.ctrlKey || e.metaKey
     const handleHitIn = hitRadiusInches(canvas, map.widthIn, HANDLE_HIT_CSS_PX)
-    const dzSlopIn = hitRadiusInches(canvas, map.widthIn, DZ_EDGE_HIT_CSS_PX)
 
     // Rotation handle first (single select)
     if (singleSelected && !additive) {
@@ -323,14 +352,6 @@ export function MapCanvas({
           return
         }
       }
-    }
-
-    const edge = dzEdgeHit(deployment, map, xIn, yIn, dzSlopIn)
-    if (edge && !additive) {
-      canvas.setPointerCapture(e.pointerId)
-      setDrag({ type: 'dz-edge', edge })
-      setOverlayLabel(`가장자리로부터 ${deployment.depthIn.toFixed(1)}″`)
-      return
     }
 
     const hit = hitTest(library, pieces, xIn, yIn)
@@ -366,14 +387,6 @@ export function MapCanvas({
       return
     }
 
-    let depth: number
-    if (deployment.axis === 'NS') {
-      depth = drag.edge === 'near' ? yIn : map.heightIn - yIn
-    } else {
-      depth = drag.edge === 'near' ? xIn : map.widthIn - xIn
-    }
-    onDeploymentDepth(depth)
-    setOverlayLabel(`가장자리로부터 ${Math.max(1, depth).toFixed(1)}″`)
   }
 
   const endDrag = () => {

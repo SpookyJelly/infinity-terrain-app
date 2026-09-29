@@ -11,8 +11,10 @@ interface ToolbarProps {
   onBorderBuffer: (inches: number) => void
   onToggleGrid: () => void
   onToggleDeployment: () => void
+  onDeploymentDepth: (depthIn: number) => void
   onDeploymentAxis: (axis: DeploymentZone['axis']) => void
   onRandomize: () => void
+  onRandomRotate: () => void
   onClearAll: () => void
   onRotate90: () => void
   onFreeRotate: () => void
@@ -31,8 +33,10 @@ export function Toolbar({
   onBorderBuffer,
   onToggleGrid,
   onToggleDeployment,
+  onDeploymentDepth,
   onDeploymentAxis,
   onRandomize,
+  onRandomRotate,
   onClearAll,
   onRotate90,
   onFreeRotate,
@@ -114,9 +118,18 @@ export function Toolbar({
           <option value="NS">위 / 아래</option>
           <option value="EW">좌 / 우</option>
         </select>
-        <span className="toolbar-muted">
-          깊이 {deployment.depthIn.toFixed(1)}″
-        </span>
+        <label>
+          깊이
+          <input
+            type="number"
+            min={1}
+            max={(deployment.axis === 'NS' ? map.heightIn : map.widthIn) / 2 - 1}
+            step={0.5}
+            value={deployment.depthIn}
+            onChange={(e) => onDeploymentDepth(Number(e.target.value) || 1)}
+          />
+          ″
+        </label>
       </div>
 
       <div className="toolbar-group">
@@ -128,6 +141,9 @@ export function Toolbar({
           onClick={onRandomize}
         >
           랜덤 재배치
+        </button>
+        <button type="button" disabled={!hasPieces} onClick={onRandomRotate}>
+          전체 회전
         </button>
         <button type="button" disabled={!hasPieces} onClick={onClearAll}>
           전체 삭제

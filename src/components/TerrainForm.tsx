@@ -143,6 +143,7 @@ export function TerrainForm({ value, onChange, idPrefix }: TerrainFormProps) {
         2층
       </label>
       {value.hasSecondFloor && (
+        <>
         <div className="form-row form-row-4">
           <label>
             2층 가로
@@ -183,6 +184,37 @@ export function TerrainForm({ value, onChange, idPrefix }: TerrainFormProps) {
             />
           </label>
         </div>
+        <div className="form-row">
+          <label>
+            2층 X 오프셋
+            <input
+              type="number"
+              step="0.5"
+              value={value.secondFloor?.offsetX ?? 0}
+              onChange={(e) => set({ secondFloor: {
+                width: value.secondFloor?.width ?? 1,
+                depth: value.secondFloor?.depth ?? 1,
+                offsetX: Number(e.target.value) || 0,
+                offsetY: value.secondFloor?.offsetY ?? 0,
+              } })}
+            />
+          </label>
+          <label>
+            2층 Y 오프셋
+            <input
+              type="number"
+              step="0.5"
+              value={value.secondFloor?.offsetY ?? 0}
+              onChange={(e) => set({ secondFloor: {
+                width: value.secondFloor?.width ?? 1,
+                depth: value.secondFloor?.depth ?? 1,
+                offsetX: value.secondFloor?.offsetX ?? 0,
+                offsetY: Number(e.target.value) || 0,
+              } })}
+            />
+          </label>
+        </div>
+        </>
       )}
       <label className="check-row">
         <input
