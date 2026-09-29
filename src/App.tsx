@@ -148,13 +148,25 @@ export default function App() {
               src={battleTableImage}
               alt="Battle Table Hobby 로고"
             />
-            <h3>공식 카톡방</h3>
+            <h3>게임 카톡방</h3>
             <ul>
               <li>
-                <small>인피니티 톡방 링크</small>
+                <a
+                  href="https://open.kakao.com/o/gOf9bsLi"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  인피니티 톡방 링크
+                </a>
               </li>
               <li>
-                <small>블랙아웃 공식 톡방 링크</small>
+                <a
+                  href="https://open.kakao.com/o/g5fGMLIi"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  블랙아웃 공식 톡방 링크
+                </a>
               </li>
             </ul>
           </section>
