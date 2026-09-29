@@ -19,6 +19,7 @@ interface MapCanvasProps {
   selectedIds: string[]
   showGrid: boolean
   deployment: DeploymentZone
+  interactive?: boolean
   onSelect: (instanceId: string | null, additive?: boolean) => void
   onMove: (instanceId: string, x: number, y: number) => void
   onRotatePiece: (instanceId: string, rotation: number) => void
@@ -76,6 +77,7 @@ export function MapCanvas({
   selectedIds,
   showGrid,
   deployment,
+  interactive = true,
   onSelect,
   onMove,
   onRotatePiece,
@@ -253,7 +255,7 @@ export function MapCanvas({
     }
 
     // Rotation handle for single selection (size scales with display so mobile stays tappable)
-    if (singleSelected) {
+    if (interactive && singleSelected) {
       const def = getPieceDef(library, singleSelected.pieceId)
       if (def) {
         const handle = rotationHandlePos(singleSelected, def)
@@ -306,6 +308,7 @@ export function MapCanvas({
     ctx.strokeRect(1, 1, widthPx - 2, heightPx - 2)
   }, [
     deployment,
+    interactive,
     heightPx,
     library,
     map.borderBufferIn,
@@ -355,8 +358,12 @@ export function MapCanvas({
     }
 
     const hit = hitTest(library, pieces, xIn, yIn)
-    onSelect(hit, additive)
-    if (hit && !additive) {
+    if (additive) {
+      onSelect(hit, true)
+      return
+    }
+    if (!hit || !selectedIds.includes(hit)) onSelect(hit, false)
+    if (hit) {
       const p = pieces.find((x) => x.instanceId === hit)!
       canvas.setPointerCapture(e.pointerId)
       setDrag({
@@ -401,10 +408,10 @@ export function MapCanvas({
         className="map-canvas"
         width={widthPx}
         height={heightPx}
-        onPointerDown={onPointerDown}
-        onPointerMove={onPointerMove}
-        onPointerUp={endDrag}
-        onPointerCancel={endDrag}
+        onPointerDown={interactive ? onPointerDown : undefined}
+        onPointerMove={interactive ? onPointerMove : undefined}
+        onPointerUp={interactive ? endDrag : undefined}
+        onPointerCancel={interactive ? endDrag : undefined}
       />
     </div>
   )
