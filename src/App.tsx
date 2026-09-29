@@ -1,5 +1,5 @@
 import { useState } from "react";
-import battleTableImage from "./assets/battle-table-hobby.jpg";
+import battleTableImage from "./assets/battle-table-hobby.svg";
 import { MapCanvas } from "./components/MapCanvas";
 import { Sidebar } from "./components/Sidebar";
 import { Toolbar } from "./components/Toolbar";
@@ -10,11 +10,8 @@ export default function App() {
   const state = useMapState();
   const [helpOpen, setHelpOpen] = useState(false);
   const [largeMapOpen, setLargeMapOpen] = useState(false);
-  const [sponsorText, setSponsorText] = useState("");
-  const [sponsorDraft, setSponsorDraft] = useState("");
 
   const openHelp = () => {
-    setSponsorDraft(sponsorText);
     setHelpOpen(true);
   };
 
