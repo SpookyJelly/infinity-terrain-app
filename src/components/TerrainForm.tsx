@@ -4,6 +4,7 @@ import type {
   TerrainPiece,
 } from '../types/terrain'
 import { CATEGORY_LABELS } from '../utils/labels'
+import { FlexibleNumberInput } from './FlexibleNumberInput'
 
 const SIDE_LABELS: Record<LadderSide, string> = {
   N: '북',
@@ -48,37 +49,11 @@ export function TerrainForm({ value, onChange, idPrefix }: TerrainFormProps) {
       <div className="form-row">
         <label>
           가로 ″
-          <input
-            type="number"
-            min={0.5}
-            step={0.5}
-            value={value.footprint.width}
-            onChange={(e) =>
-              set({
-                footprint: {
-                  ...value.footprint,
-                  width: Math.max(0.5, Number(e.target.value) || 0.5),
-                },
-              })
-            }
-          />
+          <FlexibleNumberInput value={value.footprint.width} min={0.5} step={0.5} onChange={(width) => width !== null && set({ footprint: { ...value.footprint, width } })} />
         </label>
         <label>
           세로 ″
-          <input
-            type="number"
-            min={0.5}
-            step={0.5}
-            value={value.footprint.depth}
-            onChange={(e) =>
-              set({
-                footprint: {
-                  ...value.footprint,
-                  depth: Math.max(0.5, Number(e.target.value) || 0.5),
-                },
-              })
-            }
-          />
+          <FlexibleNumberInput value={value.footprint.depth} min={0.5} step={0.5} onChange={(depth) => depth !== null && set({ footprint: { ...value.footprint, depth } })} />
         </label>
       </div>
       <label>

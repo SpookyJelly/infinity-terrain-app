@@ -57,7 +57,7 @@ export const PRESET_PIECES: TerrainPiece[] = [
     name: "2층 건물 + 사다리",
     footprint: { width: 8, depth: 8 },
     category: "total_cover",
-    maxCount: 2,
+    maxCount: null,
     hasSecondFloor: true,
     secondFloor: { width: 5, depth: 5, offsetX: 0, offsetY: 0 },
     hasLadder: true,

@@ -156,7 +156,7 @@ export default function App() {
                   target="_blank"
                   rel="noreferrer"
                 >
-                  인피니티 톡방 링크
+                  INFINITY N5 한국 네트워크
                 </a>
               </li>
               <li>
@@ -165,7 +165,7 @@ export default function App() {
                   target="_blank"
                   rel="noreferrer"
                 >
-                  블랙아웃 공식 톡방 링크
+                  BLKOUT 블랙아웃 코리아
                 </a>
               </li>
             </ul>

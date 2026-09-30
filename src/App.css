@@ -159,6 +159,16 @@
   border: 1px solid var(--line);
   border-radius: 6px;
   background: #fffdf8;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.lib-editor .form-row {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.lib-editor .form-row > label {
+  min-width: 0;
 }
 
 .terrain-form {
@@ -178,6 +188,10 @@
 
 .terrain-form input,
 .terrain-form select {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
   border: 1px solid var(--line);
   border-radius: 4px;
   background: #fff;
@@ -201,6 +215,20 @@
   flex-direction: row !important;
   align-items: center;
   gap: 0.4rem !important;
+}
+
+.terrain-form .check-row {
+  width: 100%;
+  min-width: 0;
+}
+
+.terrain-form .check-row input[type="checkbox"] {
+  flex: 0 0 auto;
+  width: auto;
+  min-width: 0;
+  max-width: none;
+  margin: 0;
+  padding: 0;
 }
 
 .inspector {

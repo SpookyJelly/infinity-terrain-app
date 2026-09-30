@@ -1,4 +1,5 @@
 import type { DeploymentZone, MapConfig } from '../types/terrain'
+import { FlexibleNumberInput } from './FlexibleNumberInput'
 
 interface ToolbarProps {
   map: MapConfig
@@ -34,9 +35,9 @@ export function Toolbar({
         <span className="toolbar-label">맵</span>
         <button type="button" onClick={() => onPreset(3)}>3×3피트</button>
         <button type="button" onClick={() => onPreset(4)}>4×4피트</button>
-        <label>가로<input type="number" min={12} step={1} value={map.widthIn} onChange={(e) => onMapSize(Number(e.target.value) || 12, map.heightIn)} />″</label>
-        <label>세로<input type="number" min={12} step={1} value={map.heightIn} onChange={(e) => onMapSize(map.widthIn, Number(e.target.value) || 12)} />″</label>
-        <label>테두리<input type="number" min={0} step={0.5} value={map.borderBufferIn} onChange={(e) => onBorderBuffer(Number(e.target.value) || 0)} />″</label>
+        <label>가로<FlexibleNumberInput value={map.widthIn} min={12} onChange={(v) => v !== null && onMapSize(v, map.heightIn)} />″</label>
+        <label>세로<FlexibleNumberInput value={map.heightIn} min={12} onChange={(v) => v !== null && onMapSize(map.widthIn, v)} />″</label>
+        <label>테두리<FlexibleNumberInput value={map.borderBufferIn} min={0} step={0.5} onChange={(v) => v !== null && onBorderBuffer(v)} />″</label>
       </div>
       <div className="toolbar-group">
         <span className="toolbar-label">오버레이</span>
@@ -45,7 +46,7 @@ export function Toolbar({
         <select value={deployment.axis} onChange={(e) => onDeploymentAxis(e.target.value as DeploymentZone['axis'])} aria-label="배치구역 방향">
           <option value="NS">위 / 아래</option><option value="EW">좌 / 우</option>
         </select>
-        <label>깊이<input type="number" min={1} max={(deployment.axis === 'NS' ? map.heightIn : map.widthIn) / 2 - 1} step={0.5} value={deployment.depthIn} onChange={(e) => onDeploymentDepth(Number(e.target.value) || 1)} />″</label>
+        <label>깊이<FlexibleNumberInput value={deployment.depthIn} min={1} max={(deployment.axis === 'NS' ? map.heightIn : map.widthIn) / 2 - 1} step={0.5} onChange={(v) => v !== null && onDeploymentDepth(v)} />″</label>
       </div>
       <div className="toolbar-group">
         <span className="toolbar-label">배치</span>
