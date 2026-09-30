@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useState } from 'react'
 import type { TerrainPiece } from '../types/terrain'
 import { CATEGORY_LABELS } from '../utils/labels'
 import { blankTerrain, TerrainForm } from './TerrainForm'
@@ -9,8 +9,8 @@ interface SidebarProps {
   onUpdatePiece: (piece: TerrainPiece) => void
   onAddPiece: (piece: TerrainPiece) => boolean
   onRemovePiece: (pieceId: string) => boolean
-  onExport: () => void
-  onImportFile: (text: string, mode: 'merge' | 'replace') => void
+  onExport: () => string
+  onImport: (text: string, mode: 'merge' | 'replace') => void
 }
 
 export function Sidebar({
@@ -20,16 +20,18 @@ export function Sidebar({
   onAddPiece,
   onRemovePiece,
   onExport,
-  onImportFile,
+  onImport,
 }: SidebarProps) {
-  const fileRef = useRef<HTMLInputElement>(null)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [draft, setDraft] = useState<TerrainPiece | null>(null)
   const [showAdd, setShowAdd] = useState(false)
   const [addDraft, setAddDraft] = useState<TerrainPiece>(() =>
     blankTerrain('new'),
   )
-  const [pendingImport, setPendingImport] = useState<string | null>(null)
+  const [dataPanel, setDataPanel] = useState<'export' | 'import' | null>(null)
+  const [exportText, setExportText] = useState('')
+  const [importText, setImportText] = useState('')
+  const [copyMessage, setCopyMessage] = useState('')
 
   const startEdit = (piece: TerrainPiece) => {
     setEditingId(piece.id)
@@ -61,34 +63,43 @@ export function Sidebar({
       </p>
 
       <div className="lib-actions">
-        <button type="button" onClick={onExport}>
+        <button type="button" onClick={() => {
+          setExportText(onExport())
+          setCopyMessage('')
+          setDataPanel(dataPanel === 'export' ? null : 'export')
+        }}>
           JSON 내보내기
         </button>
-        <button type="button" onClick={() => fileRef.current?.click()}>
+        <button type="button" onClick={() => setDataPanel(dataPanel === 'import' ? null : 'import')}>
           JSON 가져오기
         </button>
-        <input
-          ref={fileRef}
-          type="file"
-          accept="application/json,.json"
-          hidden
-          onChange={async (e) => {
-            const file = e.target.files?.[0]
-            e.target.value = ''
-            if (!file) return
-            setPendingImport(await file.text())
-          }}
-        />
       </div>
 
-      {pendingImport && (
+      {dataPanel === 'export' && (
+        <div className="library-data-panel">
+          <label htmlFor="library-export">라이브러리 JSON</label>
+          <textarea id="library-export" value={exportText} readOnly />
+          <button type="button" onClick={async () => {
+            try {
+              await navigator.clipboard.writeText(exportText)
+              setCopyMessage('복사했습니다.')
+            } catch {
+              setCopyMessage('복사할 수 없습니다. 텍스트를 직접 선택해 복사해 주세요.')
+            }
+          }}>텍스트 복사</button>
+          {copyMessage && <small role="status">{copyMessage}</small>}
+        </div>
+      )}
+
+      {dataPanel === 'import' && (
         <div className="import-choice">
+          <label htmlFor="library-import">JSON 텍스트를 붙여넣으세요</label>
+          <textarea id="library-import" value={importText} onChange={(e) => setImportText(e.target.value)} placeholder="JSON 붙여넣기" />
           <p>가져온 라이브러리를 어떻게 적용할까요?</p>
           <button
             type="button"
             onClick={() => {
-              onImportFile(pendingImport, 'merge')
-              setPendingImport(null)
+              onImport(importText, 'merge')
             }}
           >
             병합
@@ -96,15 +107,12 @@ export function Sidebar({
           <button
             type="button"
             onClick={() => {
-              onImportFile(pendingImport, 'replace')
-              setPendingImport(null)
+              onImport(importText, 'replace')
             }}
           >
             덮어쓰기
           </button>
-          <button type="button" onClick={() => setPendingImport(null)}>
-            취소
-          </button>
+          <button type="button" onClick={() => setDataPanel(null)}>닫기</button>
         </div>
       )}
 

@@ -39,7 +39,7 @@ export default function App() {
         onAddPiece={state.addLibraryPiece}
         onRemovePiece={state.removeLibraryPiece}
         onExport={state.exportLibrary}
-        onImportFile={state.importLibrary}
+        onImport={state.importLibrary}
       />
       <div className="main">
         <Toolbar

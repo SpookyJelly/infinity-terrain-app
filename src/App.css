@@ -126,6 +126,33 @@
   font-size: 0.8rem;
 }
 
+.library-data-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin: 0 0 0.75rem;
+  padding: 0.55rem;
+  border: 1px dashed var(--line);
+  border-radius: 6px;
+  background: #fffdf8;
+  font-size: 0.8rem;
+}
+
+.library-data-panel textarea,
+.import-choice textarea {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 8rem;
+  max-height: 12rem;
+  overflow: auto;
+  resize: vertical;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 0.45rem;
+  font: 0.75rem/1.4 ui-monospace, SFMono-Regular, Consolas, monospace;
+  white-space: pre;
+}
+
 .lib-editor {
   margin: 0.4rem 0 0.75rem;
   padding: 0.55rem;

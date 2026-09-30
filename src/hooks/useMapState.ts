@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { PRESET_PIECES } from "../data/presets";
 import type {
   AppUiFlags,
@@ -33,13 +33,30 @@ const DEFAULT_DZ: DeploymentZone = {
   depthIn: 8,
 };
 
+const LIBRARY_STORAGE_KEY = "infinity-terrain-library";
+
+function loadLibrary(): TerrainPiece[] {
+  try {
+    const saved = localStorage.getItem(LIBRARY_STORAGE_KEY);
+    if (saved) {
+      const parsed = parseLibraryJson(saved);
+      if (parsed.ok) return parsed.library;
+    }
+  } catch {
+    // Storage may be unavailable; keep the built-in library usable.
+  }
+  return PRESET_PIECES.map((p) => ({ ...p, footprint: { ...p.footprint } }));
+}
+
 export function useMapState() {
-  const [library, setLibrary] = useState<TerrainPiece[]>(() =>
-    PRESET_PIECES.map((p) => ({
-      ...p,
-      footprint: { ...p.footprint },
-    })),
-  );
+  const [library, setLibrary] = useState<TerrainPiece[]>(loadLibrary);
+  useEffect(() => {
+    try {
+      localStorage.setItem(LIBRARY_STORAGE_KEY, serializeLibrary(library));
+    } catch {
+      setStatusMsg("브라우저 저장 공간에 라이브러리를 저장하지 못했습니다.");
+    }
+  }, [library]);
   const [map, setMap] = useState<MapConfig>(DEFAULT_MAP);
   const [pieces, setPieces] = useState<PlacedPiece[]>([]);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
@@ -330,17 +347,7 @@ export function useMapState() {
     [pieces, selectedIds],
   );
 
-  const exportLibrary = useCallback(() => {
-    const json = serializeLibrary(library);
-    const blob = new Blob([json], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "infinity-terrain-library.json";
-    a.click();
-    URL.revokeObjectURL(url);
-    setStatusMsg("라이브러리 JSON을 내보냈습니다.");
-  }, [library]);
+  const exportLibrary = useCallback(() => serializeLibrary(library), [library]);
 
   const importLibrary = useCallback(
     (text: string, mode: "merge" | "replace") => {
