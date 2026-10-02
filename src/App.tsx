@@ -7,7 +7,9 @@ import { useMapState } from "./hooks/useMapState";
 import "./App.css";
 
 export default function App() {
-  const state = useMapState();
+   const state = useMapState();
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [toolbarCollapsed, setToolbarCollapsed] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
   const [largeMapOpen, setLargeMapOpen] = useState(false);
 
@@ -34,6 +36,8 @@ export default function App() {
     <div className="app">
       <Sidebar
         library={state.library}
+        collapsed={sidebarCollapsed}
+        onToggleCollapse={() => setSidebarCollapsed((value) => !value)}
         onPlace={state.addPieceFromLibrary}
         onUpdatePiece={state.updateLibraryPiece}
         onAddPiece={state.addLibraryPiece}
@@ -44,6 +48,8 @@ export default function App() {
       <div className="main">
         <Toolbar
           map={state.map}
+          collapsed={toolbarCollapsed}
+          onToggleCollapse={() => setToolbarCollapsed((value) => !value)}
           showGrid={state.ui.showGrid}
           deployment={state.deployment}
           hasSelection={state.selectedIds.length > 0}

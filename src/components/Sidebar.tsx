@@ -5,6 +5,8 @@ import { blankTerrain, TerrainForm } from "./TerrainForm";
 
 interface SidebarProps {
   library: TerrainPiece[];
+  collapsed: boolean;
+  onToggleCollapse: () => void;
   onPlace: (pieceId: string) => void;
   onUpdatePiece: (piece: TerrainPiece) => void;
   onAddPiece: (piece: TerrainPiece) => boolean;
@@ -15,6 +17,8 @@ interface SidebarProps {
 
 export function Sidebar({
   library,
+  collapsed,
+  onToggleCollapse,
   onPlace,
   onUpdatePiece,
   onAddPiece,
@@ -56,7 +60,8 @@ export function Sidebar({
   };
 
   return (
-    <aside className="sidebar">
+    <aside className={collapsed ? "sidebar sidebar-collapsed" : "sidebar"}>
+  <button type="button" className="mobile-panel-toggle" aria-expanded={!collapsed} onClick={onToggleCollapse}>{collapsed ? "라이브러리 펼치기" : "라이브러리 접기"}</button>
       <h2 className="sidebar-title">지형 라이브러리</h2>
       <p className="sidebar-hint">카드를 누르면 맵에 1개 배치됩니다.</p>
 

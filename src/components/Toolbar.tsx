@@ -7,6 +7,8 @@ interface ToolbarProps {
   deployment: DeploymentZone
   hasSelection: boolean
   hasPieces: boolean
+  collapsed: boolean
+  onToggleCollapse: () => void
   onPreset: (sizeFt: 3 | 4) => void
   onMapSize: (widthIn: number, heightIn: number) => void
   onBorderBuffer: (inches: number) => void
@@ -24,13 +26,14 @@ interface ToolbarProps {
 }
 
 export function Toolbar({
-  map, showGrid, deployment, hasSelection, hasPieces, onPreset, onMapSize,
+  map, showGrid, deployment, hasSelection, hasPieces, collapsed, onToggleCollapse, onPreset, onMapSize,
   onBorderBuffer, onToggleGrid, onToggleDeployment, onDeploymentDepth,
   onDeploymentAxis, onRandomize, onRandomRotate, onClearAll, onRotate90,
   onFreeRotate, onToggleLock, onDelete,
 }: ToolbarProps) {
   return (
-    <header className="toolbar">
+    <header className={collapsed ? "toolbar toolbar-collapsed" : "toolbar"}>
+  <button type="button" className="mobile-panel-toggle" aria-expanded={!collapsed} onClick={onToggleCollapse}>{collapsed ? "옵션 펼치기" : "옵션 접기"}</button>
       <div className="toolbar-group">
         <span className="toolbar-label">맵</span>
         <button type="button" onClick={() => onPreset(3)}>3×3피트</button>

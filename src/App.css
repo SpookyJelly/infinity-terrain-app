@@ -571,3 +571,38 @@
     padding: 0.45rem 0.65rem;
   }
 }
+
+.mobile-panel-toggle {
+  display: none;
+}
+@media (max-width: 800px) {
+  .mobile-panel-toggle {
+    display: block;
+    width: 100%;
+    min-height: 38px;
+    padding: 0.4rem 0.75rem;
+    border: 1px solid var(--line);
+    border-radius: 5px;
+    background: #fffdf8;
+    color: var(--ink);
+    text-align: center;
+    cursor: pointer;
+  }
+  .sidebar.sidebar-collapsed {
+    height: auto;
+    min-height: 0;
+    max-height: none;
+    padding: 0.4rem 0.65rem;
+    overflow: hidden;
+  }
+  .sidebar.sidebar-collapsed > :not(.mobile-panel-toggle) {
+    display: none !important;
+  }
+  .toolbar.toolbar-collapsed {
+    min-height: 0;
+    padding: 0.4rem 0.65rem;
+  }
+  .toolbar.toolbar-collapsed > :not(.mobile-panel-toggle) {
+    display: none !important;
+  }
+}
